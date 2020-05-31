@@ -2,23 +2,34 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import java.awt.*
 import java.awt.image.BufferedImage
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 data class Hex(val row: Int, val col: Int) {
 
-    //
+    private val isSelected = AtomicBoolean(false)
+
     var poly: Polygon? = null
 
-    //    var occupyingUnit: Entity? = null
-//
-//    fun isOccupied() = occupyingUnit != null
     fun containsPoint(x: Int, y: Int): Boolean {
         return poly?.contains(x,y) ?: false
+    }
+
+    fun setSelected(selected: Boolean) {
+        isSelected.set(selected)
+    }
+
+    fun isSelected(): Boolean {
+        return isSelected.get()
     }
 }
 
 
-class HexMap(private val rows: Int, private val columns: Int, private val hexSize: Int = 50) {
+class HexMap(private val width: Int,
+             private val height: Int,
+             private val rows: Int,
+             private val columns: Int,
+             private val hexSize: Int = 50) {
 
     private val imageChannel = ConflatedBroadcastChannel<BufferedImage>()
     val imageFlow = imageChannel.asFlow()
@@ -56,7 +67,7 @@ class HexMap(private val rows: Int, private val columns: Int, private val hexSiz
     /**
      * Render an image based on that state of the hex map and publish the result to the channel
      */
-    fun publishBufferedImage(width: Int, height: Int) {
+    fun publishBufferedImage() {
 
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         val g = image.graphics as Graphics2D
@@ -91,10 +102,10 @@ class HexMap(private val rows: Int, private val columns: Int, private val hexSiz
                     hex.poly = poly
                 }
 
-//                if (hex.isSelected) {
-//                    g.color = Color.RED
-//                    g.fillPolygon(poly)
-//                }
+                if (hex.isSelected()) {
+                    g.color = Color.RED
+                    g.fillPolygon(poly)
+                }
 
                 g.color = Color.BLACK
                 g.stroke = BasicStroke(5f)

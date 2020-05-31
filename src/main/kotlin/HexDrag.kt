@@ -1,6 +1,8 @@
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 object HexDrag {
 
     private const val width = 1200
@@ -9,7 +11,7 @@ object HexDrag {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val hexMap = HexMap(12,14)
+        val hexMap = HexMap(width, height, 12,14)
         val gameMaster = GameMaster(hexMap)
         val gameFrame = GameFrame(hexMap.imageFlow, width, height)
         gameFrame.setMouseAdapter(mouseClickAdapter)
@@ -17,7 +19,7 @@ object HexDrag {
         gameFrame.display()
 
         GlobalScope.launch {
-            hexMap.publishBufferedImage(width, height)
+            hexMap.publishBufferedImage()
         }
     }
 
