@@ -1,4 +1,5 @@
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import java.awt.Point
 import java.awt.event.MouseEvent
@@ -15,8 +16,10 @@ enum class MouseClickType {
 
 data class MouseClick(val type: MouseClickType, val point: Point)
 
+@ExperimentalCoroutinesApi
 val mouseClickChannel = ConflatedBroadcastChannel<MouseClick>()
 
+@ExperimentalCoroutinesApi
 val mouseClickAdapter = object : MouseInputAdapter() {
 
     override fun mousePressed(e: MouseEvent?) {

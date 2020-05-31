@@ -1,3 +1,4 @@
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
@@ -12,10 +13,11 @@ import javax.swing.JFrame
 import javax.swing.event.MouseInputAdapter
 
 
+@ExperimentalCoroutinesApi
 class GameFrame(
     private val imageReceptionFlow: Flow<BufferedImage>,
-    private val width: Int = 1000,
-    private val height: Int = 1000) {
+   width: Int = 1000,
+   height: Int = 1000) {
 
     private val frame = JFrame()
     private val canvas = Canvas() // TODO: investigate graphicsConfiguration / DoubleBuffer?

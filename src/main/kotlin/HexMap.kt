@@ -56,7 +56,7 @@ class HexMap(private val rows: Int, private val columns: Int, private val hexSiz
     /**
      * Render an image based on that state of the hex map and publish the result to the channel
      */
-    suspend fun publishBufferedImage(width: Int, height: Int) {
+    fun publishBufferedImage(width: Int, height: Int) {
 
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         val g = image.graphics as Graphics2D
