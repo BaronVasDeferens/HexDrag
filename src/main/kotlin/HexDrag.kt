@@ -9,8 +9,6 @@ object HexDrag {
     @JvmStatic
     fun main(args: Array<String>) {
 
-
-
         val hexMap = HexMap(12,14)
         val gameMaster = GameMaster(hexMap)
         val gameFrame = GameFrame(hexMap.imageFlow, width, height)
@@ -19,7 +17,7 @@ object HexDrag {
         gameFrame.display()
 
         GlobalScope.launch {
-            val hexMapImage = hexMap.publishBufferedImage(width, height)
+            hexMap.publishBufferedImage(width, height)
         }
     }
 
