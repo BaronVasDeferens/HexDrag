@@ -1,10 +1,7 @@
-import javafx.scene.shape.StrokeType
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.flow.asFlow
 import java.awt.*
 import java.awt.image.BufferedImage
-import java.nio.Buffer
-import javax.swing.border.StrokeBorder
 
 
 data class Hex(val row: Int, val col: Int) {
@@ -22,6 +19,9 @@ data class Hex(val row: Int, val col: Int) {
 
 
 class HexMap(private val rows: Int, private val columns: Int, private val hexSize: Int = 50) {
+
+    private val imageChannel = ConflatedBroadcastChannel<BufferedImage>()
+    val imageFlow = imageChannel.asFlow()
 
     private val hexArray: Array<Array<Hex>>
 
@@ -45,11 +45,18 @@ class HexMap(private val rows: Int, private val columns: Int, private val hexSiz
 //        }
 //    }
 
-    fun getHexAt(row: Int, column: Int): Hex? {
+    fun getHexAtClick(x: Int, y: Int): Hex? {
+        return hexArray.flatten().firstOrNull { it.containsPoint(x,y) }
+    }
+
+    fun getHexAtRowCol(row: Int, column: Int): Hex? {
         return hexArray[row][column]
     }
 
-    suspend fun renderToBufferedImage(width: Int, height: Int): BufferedImage {
+    /**
+     * Render an image based on that state of the hex map and publish the result to the channel
+     */
+    suspend fun publishBufferedImage(width: Int, height: Int) {
 
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         val g = image.graphics as Graphics2D
@@ -79,7 +86,7 @@ class HexMap(private val rows: Int, private val columns: Int, private val hexSiz
                 poly.addPoint(x + hexSize / 2, (.8660 * 2.0 * hexSize.toDouble() + y).toInt())
                 poly.addPoint(x, y + (.8660 * hexSize).toInt())
 
-                val hex = getHexAt(i, j)!!
+                val hex = getHexAtRowCol(i, j)!!
                 if (hex.poly == null) {
                     hex.poly = poly
                 }
@@ -116,7 +123,7 @@ class HexMap(private val rows: Int, private val columns: Int, private val hexSiz
         }
 
         g.dispose()
-        return image
+        imageChannel.offer(image)
     }
 
 }

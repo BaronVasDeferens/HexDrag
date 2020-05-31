@@ -1,3 +1,8 @@
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.awt.Canvas
 import java.awt.Dimension
 import java.awt.Graphics2D
@@ -7,7 +12,10 @@ import javax.swing.JFrame
 import javax.swing.event.MouseInputAdapter
 
 
-class GameFrame(private val width: Int = 1000, private val height: Int = 1000) {
+class GameFrame(
+    private val imageReceptionFlow: Flow<BufferedImage>,
+    private val width: Int = 1000,
+    private val height: Int = 1000) {
 
     private val frame = JFrame()
     private val canvas = Canvas() // TODO: investigate graphicsConfiguration / DoubleBuffer?
@@ -25,6 +33,12 @@ class GameFrame(private val width: Int = 1000, private val height: Int = 1000) {
         frame.pack()
 
         canvas.requestFocus()
+
+        GlobalScope.launch {
+            imageReceptionFlow.onEach { image ->
+                drawImage(image)
+            }.launchIn(this)
+        }
     }
 
     fun setKeyListener(listener: KeyListener) {
@@ -40,7 +54,7 @@ class GameFrame(private val width: Int = 1000, private val height: Int = 1000) {
         frame.isVisible = true
     }
 
-    fun drawImage(image: BufferedImage, x: Int = 0, y: Int = 0) {
+    private fun drawImage(image: BufferedImage, x: Int = 0, y: Int = 0) {
         val graphics = canvas.graphics as Graphics2D
         graphics.drawImage(image, x, y, null)
         graphics.dispose()
