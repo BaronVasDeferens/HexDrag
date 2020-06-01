@@ -1,3 +1,5 @@
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import java.awt.*
@@ -8,7 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 data class Hex(val row: Int, val col: Int) {
 
     private val isSelected = AtomicBoolean(false)
-
     var poly: Polygon? = null
 
     fun containsPoint(x: Int, y: Int): Boolean {
@@ -25,6 +26,8 @@ data class Hex(val row: Int, val col: Int) {
 }
 
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class HexMap(private val width: Int,
              private val height: Int,
              private val rows: Int,
@@ -52,10 +55,52 @@ class HexMap(private val width: Int,
         return hexArray[row][column]
     }
 
+    fun findAdjacentHexesTo(center: Hex): Set<Hex> {
+        val adjacentHexes = mutableSetOf<Hex>()
+
+        hexArray.flatten().forEach { hex ->
+            if ((hex.col == center.col) && (hex.row == center.row - 1)) {
+                adjacentHexes.add(hex)
+            }
+
+            if ((hex.col == center.col) && (hex.row == center.row + 1)) {
+                adjacentHexes.add(hex)
+            }
+
+            if ((hex.row == center.row) && (hex.col  == center.col - 1)) {
+                adjacentHexes.add(hex)
+            }
+
+            if ((hex.row == center.row) && (hex.col == center.col + 1)) {
+                adjacentHexes.add(hex)
+            }
+
+            if (center.col % 2 != 0) {
+                if ((center.col - 1 == hex.col) && (center.row + 1 == hex.row)) {
+                    adjacentHexes.add(hex)
+                }
+
+                if ((center.col + 1 == hex.col) && (center.row + 1 == hex.row)) {
+                    adjacentHexes.add(hex)
+                }
+            } else {
+                if ((center.col - 1 == hex.col) && (center.row - 1 == hex.row)) {
+                    adjacentHexes.add(hex)
+                }
+
+                if ((center.col + 1 == hex.col) && (center.row - 1 == hex.row)) {
+                    adjacentHexes.add(hex)
+                }
+            }
+        }
+
+        return adjacentHexes
+    }
+
     /**
      * Render an image based on that state of the hex map and publish the result to the channel
      */
-    fun publishBufferedImage() {
+    fun publishBufferedImage(highlightedHexes: Set<Hex> = setOf()) {
 
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         val g = image.graphics as Graphics2D
@@ -70,7 +115,6 @@ class HexMap(private val width: Int,
         var y = beginDrawingFromY
 
         for (i in 0 until rows) {
-
             for (j in 0 until columns) {
                 if (j % 2 != 0)
                     y = beginDrawingFromY + (.8660 * hexSize).toInt()
@@ -92,6 +136,11 @@ class HexMap(private val width: Int,
 
                 if (hex.isSelected()) {
                     g.color = Color.RED
+                    g.fillPolygon(poly)
+                }
+
+                if (highlightedHexes.contains(hex)) {
+                    g.color = Color.PINK
                     g.fillPolygon(poly)
                 }
 

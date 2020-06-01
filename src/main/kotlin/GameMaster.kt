@@ -17,8 +17,15 @@ class GameMaster (private val hexMap: HexMap){
                 when (click.type) {
                     MouseClickType.MOUSE_CLICK_PRIMARY_DOWN -> {
                         hexMap.getHexAtClick(click.point.x, click.point.y)?.apply {
-                            this.setSelected(!this.isSelected())
-                            hexMap.publishBufferedImage()
+
+                            if (!this.isSelected()) {
+                                this.setSelected(true)
+                                val adjacentHexes = hexMap.findAdjacentHexesTo(this)
+                                hexMap.publishBufferedImage(adjacentHexes)
+                            } else {
+                                this.setSelected(false)
+                                hexMap.publishBufferedImage()
+                            }
                         }
                     }
 
