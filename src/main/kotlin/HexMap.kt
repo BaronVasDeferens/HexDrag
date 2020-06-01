@@ -97,6 +97,23 @@ class HexMap(private val width: Int,
         return adjacentHexes
     }
 
+    fun findAllAdjacentHexesTo(center: Hex, depth: Int, adjacentSet: MutableSet<Hex>): Set<Hex> {
+
+        if (depth == 0) {
+            return adjacentSet
+        }
+
+        val adjacents = findAdjacentHexesTo(center)
+        adjacentSet.addAll(adjacents)
+
+        adjacents
+            .forEach {
+                adjacentSet.addAll(findAllAdjacentHexesTo(it, depth - 1, adjacentSet))
+            }
+
+        return adjacentSet
+    }
+
     /**
      * Render an image based on that state of the hex map and publish the result to the channel
      */
@@ -134,13 +151,13 @@ class HexMap(private val width: Int,
                     hex.poly = poly
                 }
 
-                if (hex.isSelected()) {
-                    g.color = Color.RED
+                if (highlightedHexes.contains(hex)) {
+                    g.color = Color.PINK
                     g.fillPolygon(poly)
                 }
 
-                if (highlightedHexes.contains(hex)) {
-                    g.color = Color.PINK
+                if (hex.isSelected()) {
+                    g.color = Color.RED
                     g.fillPolygon(poly)
                 }
 

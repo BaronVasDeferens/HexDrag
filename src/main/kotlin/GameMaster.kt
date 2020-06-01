@@ -20,7 +20,7 @@ class GameMaster (private val hexMap: HexMap){
 
                             if (!this.isSelected()) {
                                 this.setSelected(true)
-                                val adjacentHexes = hexMap.findAdjacentHexesTo(this)
+                                val adjacentHexes = hexMap.findAllAdjacentHexesTo(this, 3, mutableSetOf())
                                 hexMap.publishBufferedImage(adjacentHexes)
                             } else {
                                 this.setSelected(false)
