@@ -7,7 +7,6 @@ import javax.swing.event.MouseInputAdapter
 
 
 enum class MouseClickType {
-    NADA,
     MOUSE_MOVE,
     MOUSE_CLICK_PRIMARY_DOWN,
     MOUSE_CLICK_SECONDARY_DOWN,
@@ -47,7 +46,6 @@ val mouseClickAdapter = object : MouseInputAdapter() {
                 mouseClickChannel.offer(MouseClick(MouseClickType.MOUSE_CLICK_SECONDARY_UP, e.point))
             }
         }
-
     }
 
     override fun mouseMoved(e: MouseEvent?) {
