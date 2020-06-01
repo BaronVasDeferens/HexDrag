@@ -44,18 +44,6 @@ class HexMap(private val width: Int,
         }
     }
 
-
-//    fun selectHex(point: Point) {
-//        hexArray.forEach { subArray ->
-//            subArray.forEach {
-//                if (it.poly != null && it.poly!!.contains(point)) {
-////                    it.isSelected = !it.isSelected
-//                    setIsImageDirty(true)
-//                }
-//            }
-//        }
-//    }
-
     fun getHexAtClick(x: Int, y: Int): Hex? {
         return hexArray.flatten().firstOrNull { it.containsPoint(x,y) }
     }
@@ -108,7 +96,7 @@ class HexMap(private val width: Int,
                 }
 
                 g.color = Color.BLACK
-                g.stroke = BasicStroke(5f)
+                g.stroke = BasicStroke(2f)
                 g.drawPolygon(poly)
 
 //                if (hex.isOccupied()) {
